@@ -1,0 +1,20 @@
+Maker-Studio Change Log
+
+Release 0.1 - 2013.01.01
+
+  NEW FEATURES
+
+	1. No
+
+  IMPROVEMENTS
+
+    1. No
+
+  BUG FIXES
+
+	1. No
+
+Release 0.1 - 2013.05.06
+
+	1. The first release of Maker-Studio.
+	2. Initialize bug tracker.

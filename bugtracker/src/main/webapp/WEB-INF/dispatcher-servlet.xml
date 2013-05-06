@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+	<!-- 自动扫描 -->
+    <context:annotation-config/>
+    <context:component-scan base-package="org.makersoft" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
+	
+	<mvc:resources mapping="/vendor/**"			location="/vendor/"  		cache-period="864000"/>
+	<mvc:resources mapping="/vendor.assets/**" 	location="/vendor/assets/"  cache-period="864000"/>
+	<mvc:resources mapping="/vendor.plugins/**" location="/vendor/plugins/" cache-period="864000"/>
+	<mvc:resources mapping="/assets/**" 		location="/assets/"  		cache-period="864000"/>
+
+	<!-- 启用注解支持 -->
+    <mvc:annotation-driven>
+    	<mvc:return-value-handlers>
+    		<bean class="org.makersoft.web.mvc.method.annotation.FormatHandlerMethodReturnValueHandler"/>
+    	</mvc:return-value-handlers>
+    	<mvc:message-converters register-defaults="true">
+			<!-- 将StringHttpMessageCOnverter的默认编码设为UTF-8 -->
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+		    	<constructor-arg value="UTF-8" />
+			</bean>
+  		</mvc:message-converters>
+    </mvc:annotation-driven>
+    
+	<!-- REST中根据URL后缀自动判定Content-Type及相应的View -->
+	<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+	    <property name="mediaTypes" >
+	        <value>
+	            json=application/json
+	            xml=application/xml
+	        </value>
+	    </property>
+	</bean>
+
+	<!-- 定义JSP文件的位置  
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	 -->
+	 <!-- FreeMarker Configurer and View Resolver -->
+	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+<!--        <property name="templateLoaderPaths">
+           <list>
+               <value>/WEB-INF/views/</value>
+           </list>
+       </property> -->
+        <property name="templateLoaderPath" value="/WEB-INF/views/"/>
+
+        <!--   直接将Freemarker.propertyies写在单独的.properties注入进来-->
+        <property name="freemarkerSettings">
+            <props>
+                <!--<prop key="template_update_delay">60000</prop>-->
+                <prop key="default_encoding">UTF-8</prop>
+                <prop key="locale">zh_CN</prop>
+                <prop key="datetime_format">yyyy-dd-MM</prop>
+                <prop key="number_format">#.0000</prop>
+                <prop key="whitespace_stripping">true</prop>
+            </props>
+        </property>
+
+        <!--全局变量部分-->
+        <property name="freemarkerVariables">
+            <map>
+                <entry key="xml_escape" value-ref="fmXmlEscape"/>
+                <entry key="html_escape" value-ref="fmHtmlEscape" />
+                <entry key="webRoot" value="/"/>
+                <entry key="cssRoot" value="/asserts/stylesheet"/>
+                <entry key="jsRoot" value="/asserts/javascript"/>
+            </map>
+        </property>
+
+        <property name="defaultEncoding" value="utf-8"/>
+    </bean>
+
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="exposeSpringMacroHelpers" value="true"/>
+        <property name="requestContextAttribute" value="rc"/>
+        <property name="contentType" value="text/html;charset=UTF-8"/>
+        <!--<property name="cache" value="true"/>
+        <property name="prefix" value="/"/>-->
+        <property name="suffix" value=".ftl"/>
+        <property name="order" value="1" />
+    </bean>
+
+    <bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape"/>
+    <bean id="fmHtmlEscape" class="freemarker.template.utility.HtmlEscape" />
+    
+	<!-- 容器默认的DefaultServletHandler处理 所有静态内容与无RequestMapping处理的URL-->
+	<mvc:default-servlet-handler />
+
+	<bean class="org.makersoft.web.mvc.method.annotation.RESTfulMappingHandlerMapping">
+		<property name="order" value="0"/>
+	</bean>
+	
+</beans>

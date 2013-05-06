@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<decorators defaultdir="/WEB-INF/views/layouts">
+	<excludes>
+		<pattern>/static/*</pattern>
+		<pattern>/api/*</pattern>
+	</excludes>
+
+	<decorator name="default" page="application.ftl">
+		<pattern>/*</pattern>
+	</decorator>
+</decorators>
+
